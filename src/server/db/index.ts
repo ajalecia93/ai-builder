@@ -1,13 +1,10 @@
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
-import * as schema from './schema';
+import { drizzle }   from 'drizzle-orm/postgres-js';
+import postgres       from 'postgres';
+import * as schema    from './schema';
+import * as relations from './relations';
 
-const connectionString = process.env.DATABASE_URL!;
-
-// Prevent multiple connections in development hot-reload
 const globalForDb = globalThis as unknown as { conn: postgres.Sql | undefined };
-
-const conn = globalForDb.conn ?? postgres(connectionString, { ssl: 'require' });
+const conn = globalForDb.conn ?? postgres(process.env.DATABASE_URL!, { ssl: 'require' });
 if (process.env.NODE_ENV !== 'production') globalForDb.conn = conn;
 
-export const db = drizzle(conn, { schema });
+export const db = drizzle(conn, { schema: { ...schema, ...relations } });
