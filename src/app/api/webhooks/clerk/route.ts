@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     const d = event.data;
     await db.insert(users).values({
       clerkId:  d.id as string,
-      email:    (d.email_addresses as { email_address: string }[])[0].email_address,
+      email: (d.email_addresses as { email_address: string }[])[0]?.email_address ?? '',
       name:     `${d.first_name ?? ''} ${d.last_name ?? ''}`.trim() || null,
       imageUrl: (d.image_url ?? null) as string | null,
       plan:     'free',
