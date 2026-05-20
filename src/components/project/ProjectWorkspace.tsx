@@ -16,6 +16,7 @@ const STATUS_STYLES: Record<string, string> = {
 
 export function ProjectWorkspace({ projectId }: { projectId: string }) {
   const [tab, setTab] = useState<'preview' | 'code'>('preview');
+
   const { data: project } = trpc.projects.getWithContent.useQuery(
     { id: projectId },
     { refetchInterval: (q) => q.state.data?.status === 'building' ? 2000 : false }
@@ -29,32 +30,44 @@ export function ProjectWorkspace({ projectId }: { projectId: string }) {
 
   return (
     <div className="h-screen flex flex-col bg-neutral-950">
+      {/* Header */}
       <header className="h-12 border-b border-neutral-800 flex items-center px-4 gap-3 flex-shrink-0">
-        <Link href="/" className="text-neutral-500 hover:text-white text-sm transition-colors">← Home</Link>
+        <Link href="/" className="text-neutral-500 hover:text-white text-sm transition-colors">
+          ← Home
+        </Link>
         <span className="text-neutral-600">/</span>
         <span className="text-white text-sm font-medium truncate flex-1">{project.name}</span>
         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[project.status] ?? STATUS_STYLES.idle}`}>
           {project.status}
         </span>
         <div className="flex gap-1 ml-2">
-          {['preview', 'code'].map(t => (
-            <button key={t} onClick={() => setTab(t as typeof tab)}
+          {(['preview', 'code'] as const).map(t => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
               className={`px-3 py-1 rounded text-xs font-medium transition-colors
-                ${tab === t ? 'bg-violet-600 text-white' : 'text-neutral-400 hover:text-white'}`}>
+                ${tab === t ? 'bg-violet-600 text-white' : 'text-neutral-400 hover:text-white'}`}
+            >
               {t === 'preview' ? 'Preview' : 'Code'}
             </button>
           ))}
         </div>
       </header>
+
+      {/* Body */}
       <div className="flex-1 flex overflow-hidden">
+        {/* Chat panel */}
         <div className="w-80 flex-shrink-0 border-r border-neutral-800 flex flex-col">
           <MessageList projectId={projectId} />
           <MessageInput projectId={projectId} />
         </div>
+
+        {/* Preview / Code */}
         {tab === 'preview' ? (
           <FragmentView
             previewUrl={project.fragment?.previewUrl ?? project.previewUrl ?? undefined}
-            isBuilding={project.status === 'building'} />
+            isBuilding={project.status === 'building'}
+          />
         ) : project.fragment ? (
           <CodeView fragment={project.fragment} />
         ) : (

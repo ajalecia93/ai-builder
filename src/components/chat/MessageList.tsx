@@ -4,10 +4,12 @@ import { trpc }              from '@/lib/trpc/client';
 
 export function MessageList({ projectId }: { projectId: string }) {
   const bottomRef = useRef<HTMLDivElement>(null);
+
   const { data: project } = trpc.projects.getWithContent.useQuery(
     { id: projectId },
     { refetchInterval: (q) => q.state.data?.status === 'building' ? 2000 : false }
   );
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [project?.messages?.length]);
@@ -24,16 +26,22 @@ export function MessageList({ projectId }: { projectId: string }) {
           </div>
         </div>
       ))}
+
+      {/* Typing indicator while building */}
       {project?.status === 'building' && (
         <div className="flex justify-start">
           <div className="bg-neutral-800 rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1.5">
-            {[0,1,2].map(i => (
-              <span key={i} className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce"
-                style={{ animationDelay: `${i * 0.15}s` }} />
+            {[0, 1, 2].map(i => (
+              <span
+                key={i}
+                className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce"
+                style={{ animationDelay: `${i * 0.15}s` }}
+              />
             ))}
           </div>
         </div>
       )}
+
       <div ref={bottomRef} />
     </div>
   );
