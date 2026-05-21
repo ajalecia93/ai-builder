@@ -1,5 +1,10 @@
 import { ProjectWorkspace } from '@/components/project/ProjectWorkspace';
 
-export default function ProjectPage({ params }: { params: { id: string } }) {
-  return <ProjectWorkspace projectId={params.id} />;
+interface Props {
+  params: Promise<{ id: string }>;
+}
+
+export default async function ProjectPage({ params }: Props) {
+  const { id } = await params;
+  return <ProjectWorkspace projectId={id} />;
 }
