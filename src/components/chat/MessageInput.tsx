@@ -19,7 +19,7 @@ export function MessageInput({ projectId }: { projectId: string }) {
   };
 
   return (
-    <div className="border-t border-neutral-800 p-3 flex gap-2 flex-shrink-0">
+    <div className="border-t border-neutral-800 p-3 flex gap-2 shrink-0">
       <textarea
         value={text}
         onChange={e => setText(e.target.value)}
@@ -27,7 +27,7 @@ export function MessageInput({ projectId }: { projectId: string }) {
         placeholder="Describe a change... (⌘+Enter to send)"
         className="flex-1 bg-neutral-900 border border-neutral-700 rounded-xl px-3 py-2
           text-sm text-white placeholder-neutral-500 resize-none focus:outline-none
-          focus:border-violet-500 min-h-[44px] max-h-[120px]"
+          focus:border-violet-500 min-h-11 max-h-30"
         rows={1}
         disabled={isPending}
       />

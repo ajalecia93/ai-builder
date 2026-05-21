@@ -31,7 +31,7 @@ export function ProjectWorkspace({ projectId }: { projectId: string }) {
   return (
     <div className="h-screen flex flex-col bg-neutral-950">
       {/* Header */}
-      <header className="h-12 border-b border-neutral-800 flex items-center px-4 gap-3 flex-shrink-0">
+      <header className="h-12 border-b border-neutral-800 flex items-center px-4 gap-3 shrink-0">
         <Link href="/" className="text-neutral-500 hover:text-white text-sm transition-colors">
           ← Home
         </Link>
@@ -57,7 +57,7 @@ export function ProjectWorkspace({ projectId }: { projectId: string }) {
       {/* Body */}
       <div className="flex-1 flex overflow-hidden">
         {/* Chat panel */}
-        <div className="w-80 flex-shrink-0 border-r border-neutral-800 flex flex-col">
+        <div className="w-80 shrink-0 border-r border-neutral-800 flex flex-col">
           <MessageList projectId={projectId} />
           <MessageInput projectId={projectId} />
         </div>

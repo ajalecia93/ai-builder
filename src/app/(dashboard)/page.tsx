@@ -62,7 +62,7 @@ export default function Dashboard() {
             onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleSubmit(); }}
             placeholder="Build a landing page for a coffee shop with menu and contact form..."
             className="w-full bg-transparent text-white text-sm resize-none focus:outline-none
-              placeholder-neutral-600 min-h-[100px]"
+              placeholder-neutral-600 min-h-25"
           />
           <div className="flex items-center justify-between pt-3 border-t border-neutral-800">
             <span className="text-xs text-neutral-600">⌘ + Enter to generate</span>
