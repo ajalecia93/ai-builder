@@ -3,23 +3,31 @@ import { useState } from 'react';
 import { trpc }     from '@/lib/trpc/client';
 
 export function MessageInput({ projectId }: { projectId: string }) {
-  const [text, setText] = useState('');
+  const [text, setText]   = useState('');
+  const [error, setError] = useState('');
   const utils = trpc.useUtils();
 
   const { mutate, isPending } = trpc.messages.send.useMutation({
     onSuccess: () => {
       setText('');
+      setError('');
       utils.projects.getWithContent.invalidate({ id: projectId });
+    },
+    onError: (e) => {
+      setError(e.message === 'NO_CREDITS' ? "You're out of credits." : e.message);
     },
   });
 
   const send = () => {
     if (!text.trim() || isPending) return;
+    setError('');
     mutate({ projectId, content: text.trim() });
   };
 
   return (
-    <div className="border-t border-neutral-800 p-3 flex gap-2 shrink-0">
+    <div className="border-t border-neutral-800 p-3 flex flex-col gap-2 shrink-0">
+      {error && <p className="text-xs text-red-400">{error}</p>}
+      <div className="flex gap-2">
       <textarea
         value={text}
         onChange={e => setText(e.target.value)}
@@ -39,6 +47,7 @@ export function MessageInput({ projectId }: { projectId: string }) {
       >
         {isPending ? '...' : 'Send'}
       </button>
+      </div>
     </div>
   );
 }

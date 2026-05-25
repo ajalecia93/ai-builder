@@ -14,25 +14,28 @@ const EXAMPLES = [
 
 export default function Dashboard() {
   const [prompt, setPrompt] = useState('');
+  const [error, setError]   = useState('');
   const router              = useRouter();
   const utils               = trpc.useUtils();
   const { data: projects }  = trpc.projects.list.useQuery();
   const { data: billing }   = trpc.billing.getCredits.useQuery();
 
-  const createProject = trpc.projects.create.useMutation({
-    onSuccess: (p) => router.push(`/project/${p.id}`),
-  });
-
-  const sendMsg = trpc.messages.send.useMutation({
-    onSuccess: () => utils.projects.list.invalidate(),
-  });
+  const createProject = trpc.projects.create.useMutation();
+  const sendMsg       = trpc.messages.send.useMutation();
 
   const handleSubmit = async () => {
     if (!prompt.trim()) return;
-    const name = prompt.slice(0, 60) + (prompt.length > 60 ? '...' : '');
-    const project = await createProject.mutateAsync({ name });
-    await sendMsg.mutateAsync({ projectId: project.id, content: prompt });
-    router.push(`/project/${project.id}`);
+    setError('');
+    try {
+      const name = prompt.slice(0, 60) + (prompt.length > 60 ? '...' : '');
+      const project = await createProject.mutateAsync({ name });
+      await sendMsg.mutateAsync({ projectId: project.id, content: prompt });
+      await utils.projects.list.invalidate();
+      router.push(`/project/${project.id}`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Something went wrong';
+      setError(msg === 'NO_CREDITS' ? "You're out of credits." : msg);
+    }
   };
 
   return (
@@ -67,13 +70,17 @@ export default function Dashboard() {
           <div className="flex items-center justify-between pt-3 border-t border-neutral-800">
             <span className="text-xs text-neutral-600">⌘ + Enter to generate</span>
             <button onClick={handleSubmit}
-              disabled={!prompt.trim() || createProject.isPending}
+              disabled={!prompt.trim() || createProject.isPending || sendMsg.isPending}
               className="bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white
                 px-5 py-2 rounded-xl text-sm font-medium transition-colors">
-              Generate →
+              {createProject.isPending || sendMsg.isPending ? 'Generating…' : 'Generate →'}
             </button>
           </div>
         </div>
+
+        {error && (
+          <p className="text-sm text-red-400 text-center mt-4">{error}</p>
+        )}
 
         <div className="flex flex-wrap gap-2 justify-center mt-5">
           {EXAMPLES.map(ex => (
